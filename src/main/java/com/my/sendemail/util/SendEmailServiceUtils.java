@@ -12,10 +12,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class SendEmailServiceUtils {
     private static JavaMailSender mailSender;
-    //@Autowired
+    @Autowired
     public SendEmailServiceUtils(JavaMailSender mailSender) {
         SendEmailServiceUtils.mailSender = mailSender;
     }

@@ -12,7 +12,7 @@ import com.my.sendemail.util.SendEmailServiceUtils;
 @Service
 public class EmailServiceImpl implements EmailServiceI {
     private static Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
-    //@Value("${mail.username}")
+    @Value("${mail.username}")
     private String from;
     
     /**

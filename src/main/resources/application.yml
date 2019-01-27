@@ -17,7 +17,7 @@ mybatis:
             rowBoundsWithCount: true
             dialect: mysql
 datasource: 
-    url: jdbc:mysql://localhost:3306/mytest?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
+    url: jdbc:mysql://127.0.0.1:3306/mytest?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
