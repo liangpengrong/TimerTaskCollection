@@ -17,7 +17,7 @@ public class EmailToolController {
     private EmailServiceI emailServiceI; 
     public void sendSimpleMail(){
         StringBuilder content = new StringBuilder();
-        for(int i=0;i<1000;i++) {
+        for(int i=0;i<10;i++) {
             content.append("干嘛呢干嘛呢干嘛呢");
         }
         emailServiceI.sendSimpleEmail("1985928228@qq.com", "王攀，你在干嘛呢说话", content.toString());
