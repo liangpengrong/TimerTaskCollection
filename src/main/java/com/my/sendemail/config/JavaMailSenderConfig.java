@@ -17,8 +17,6 @@ import lombok.Setter;
 * @date [2019-01-23 11:15:37]
 */
 @Configuration
-@Getter
-@Setter
 public class JavaMailSenderConfig {
     private static Logger logger = LoggerFactory.getLogger(JavaMailSenderConfig.class);
     public static final String JAVA_MAIL_SENDERCONFIG_BEAN_NAME = "javaMailSender";

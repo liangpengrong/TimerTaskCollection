@@ -20,8 +20,8 @@ public class EmailToolController {
         for(int i=0;i<10;i++) {
             content.append("干嘛呢干嘛呢干嘛呢");
         }
-        emailServiceI.sendSimpleEmail("1985928228@qq.com", "王攀，你在干嘛呢说话", content.toString());
-        System.out.println("执行了发邮件的方法,邮件内容："+content.toString());
+        //emailServiceI.sendSimpleEmail("1985928228@qq.com", "王攀，你在干嘛呢说话", content.toString());
+        //System.out.println("执行了发邮件的方法,邮件内容："+content.toString());
     }
     @Test
     public void mainText() {
