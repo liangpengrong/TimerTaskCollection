@@ -5,9 +5,9 @@
 <configuration status="INFO">
       <properties>
             <!-- 配置日志存放的文件夹 -->
-            <property name="LOG_HOME">MySendEmail-logs</property>
+            <property name="LOG_HOME">TimerTask-logs</property>
             <!-- 配置日志名称 -->
-            <property name="LOG_NAME_HOME">MySendEmail</property>
+            <property name="LOG_NAME_HOME">TimerTask</property>
         </properties>
      <appenders>
          <!--这个输出控制台的配置-->

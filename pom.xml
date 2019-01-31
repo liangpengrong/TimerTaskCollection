@@ -3,13 +3,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.my.sendemail</groupId>
-    <artifactId>MySendEmail</artifactId>
+    <groupId>com.my.timertask</groupId>
+    <artifactId>TimerTaskCollection</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>MySendEmail</name>
-    <description>MySendEmail</description>
+    <name>TimerTaskCollection</name>
+    <description>TimerTaskCollection</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -206,7 +206,7 @@
     </dependencies>
 
     <build>
-        <finalName>MySendEmail</finalName>
+        <finalName>TimerTaskCollection</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

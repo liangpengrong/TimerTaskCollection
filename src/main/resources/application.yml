@@ -3,10 +3,10 @@ server:
     port: 51005
     servlet: 
         # 配置访问路径添加项目名称
-        context-path: /MySendEmail
+        context-path: /TimerTaskCollection
 mybatis: 
     #配置mybatis扫描的mapp xml路径
-    mapper-locations: classpath*:com/my/sendemail/mapping/*.xml
+    mapper-locations: classpath*:com/my/timertask/mapping/*.xml
     configuration:
         map-underscore-to-camel-case: true
     #配置分页插件参数
