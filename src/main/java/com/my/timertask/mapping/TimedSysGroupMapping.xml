@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.timertask.dao.TimedSysGroupDaoI">
+    <!--查询nf_customer_ip表并返回结果集 -->
+    <select id="listTimedSysGroup" resultType="com.my.timertask.entity.po.TimedTaskPO" parameterType="com.my.timertask.entity.po.TimedTaskPO">
+        SELECT * FROM t_timedtask <where>
+        <if test=" null != id and '' != id">AND id = #{id}</if>
+        <if test=" null != groupCode and '' != groupCode">AND group_code = #{groupCode}</if>
+        <if test=" null != groupVal and '' != groupVal">AND group_val = #{groupVal}</if>
+        <if test=" null != groupDesc and '' != groupDesc">AND group_desc = #{groupDesc}</if>
+        <if test=" null != createDate and '' != createDate">AND create_date = #{createDate}</if>
+        </where>
+    </select>
+</mapper>

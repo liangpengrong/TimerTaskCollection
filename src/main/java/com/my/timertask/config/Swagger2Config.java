@@ -27,19 +27,18 @@ public class Swagger2Config {
                 .apiInfo(apiInfo())
                 .select()
                 //为当前包路径
-                .apis(RequestHandlerSelectors.basePackage("com.my.sendemail.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.my.timertask.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
     //构建 api文档的详细信息函数,注意这里的注解引用的是哪个
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("我的发送邮件项目")
-                .description("提供发送邮件服务")// API描述
-                .version("1.0.0")// 联系人
-                .termsOfServiceUrl("http://xxx.xxx.xxx:x/MySendEmail/")//服务地址
-                .contact("你我他")// 联系人
-                .licenseUrl("http://xxx.xxx.xxx:x/MySendEmail/")//许可URL
+                .title("定时任务组项目")
+                .description("提供各种定时任务服务，可开放API供其他人使用也可在web页面上配置")// API描述
+                .version("1.0.0")
+                .termsOfServiceUrl("https://github.com/l575989285/TimerTaskCollection")//服务地址
+                .contact("l575989285@163.com")// 联系人
                 .build();
     }
 }

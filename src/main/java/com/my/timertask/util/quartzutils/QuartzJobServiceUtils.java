@@ -23,74 +23,32 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.my.timertask.dao.TimedTaskDaoI;
-import com.my.timertask.po.TimedTaskPo;
+import com.my.timertask.entity.po.TimedTaskPO;
 
 @Component
 public class QuartzJobServiceUtils {
     public static final String JOB_DATA_MAP_KET = "scheduleJob";
     private static Scheduler scheduler;
     private static TimedTaskDaoI timedTaskDao;
-    private static ApplicationContext applicationContext;
     @Autowired
     public QuartzJobServiceUtils(Scheduler scheduler, TimedTaskDaoI timedTaskDao, ApplicationContext applicationContext) {
         QuartzJobServiceUtils.scheduler = scheduler;
         QuartzJobServiceUtils.timedTaskDao = timedTaskDao;
-        QuartzJobServiceUtils.applicationContext = applicationContext;
     }
     
-    /** <blockquote>
-    * 创建一个默认的定时任务实体类 
-    * @param class1 - 要执行的class
-    * @param methodName - class中的那个方法
-    * @param cron - 表达式
-    * @param desc - 定时任务描述
-    * @param createUserId - 创建者id
-    * @param modifyUserId - 修改者id
-    * @return
-    */  
-    public static TimedTaskPo getDefaultTimedTask(Class<?> class1, String methodName, String cron, String desc, String createUserId, String modifyUserId) {
-        TimedTaskPo scheduleJob = null;
-        if(class1 != null && methodName != null && cron != null) {
-            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            String[] beanNames = applicationContext.getBeanNamesForType(class1);
-            String beanName = beanNames != null && beanNames.length > 0? beanNames[0] : null;
-            scheduleJob = new TimedTaskPo();
-            String jobName = class1.getName()+"_"+methodName;
-            scheduleJob.setName(jobName);
-            scheduleJob.setBeanName(beanName);
-            scheduleJob.setGroupName(class1.getName());
-            scheduleJob.setMethodName(methodName);
-            scheduleJob.setCron(cron);
-            if(StringUtils.isNotEmpty(createUserId)) {
-                scheduleJob.setCreateUserId(createUserId);
-                scheduleJob.setCreateDate(time);
-            }
-            scheduleJob.setJobStatus(QuartzJobStatusEnum.可用.getKey().toString());
-            scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.立即运行.getKey().toString());
-            scheduleJob.setDescription(desc);
-            if(StringUtils.isNotEmpty(modifyUserId)) {
-                scheduleJob.setModifyUserId(modifyUserId);
-                scheduleJob.setModifyDate(time);
-            }else if (StringUtils.isNotEmpty(createUserId)) {
-                scheduleJob.setModifyUserId(createUserId);
-                scheduleJob.setModifyDate(time);
-            }
-        }
-        return scheduleJob;
-    }
     /** <blockquote>
     * 获取所有计划中的任务
     * @return
     * @throws Exception 
     */
-    public static List<TimedTaskPo> getPlanJobs() throws Exception {
+    public static List<TimedTaskPO> getPlanJobs() throws Exception {
         GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
         Set<JobKey> jobKeys = scheduler.getJobKeys(matcher);
-        List<TimedTaskPo> jobList = new ArrayList<TimedTaskPo>();
+        List<TimedTaskPO> jobList = new ArrayList<TimedTaskPO>();
         for(JobKey jobKey  : jobKeys){
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
             for (Trigger trigger : triggers){
-                TimedTaskPo job = (TimedTaskPo) trigger.getJobDataMap().get(JOB_DATA_MAP_KET);
+                TimedTaskPO job = (TimedTaskPO) trigger.getJobDataMap().get(JOB_DATA_MAP_KET);
                 Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
                 job.setJobStatus(triggerState.name());
                 if (trigger instanceof CronTrigger) {
@@ -109,12 +67,12 @@ public class QuartzJobServiceUtils {
     * @return
     * @throws Exception 
     */
-    public static List<TimedTaskPo> getRunningJobs() throws Exception {
+    public static List<TimedTaskPO> getRunningJobs() throws Exception {
         List<JobExecutionContext> executingJobs = scheduler.getCurrentlyExecutingJobs();
-        List<TimedTaskPo> jobList = new ArrayList<TimedTaskPo>();
+        List<TimedTaskPO> jobList = new ArrayList<TimedTaskPO>();
         for (JobExecutionContext executingJob : executingJobs){
             Trigger trigger = executingJob.getTrigger();
-            TimedTaskPo job = (TimedTaskPo) trigger.getJobDataMap().get(JOB_DATA_MAP_KET);
+            TimedTaskPO job = (TimedTaskPO) trigger.getJobDataMap().get(JOB_DATA_MAP_KET);
             Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
             job.setJobStatus(triggerState.name());
             if (trigger instanceof CronTrigger) {
@@ -132,14 +90,18 @@ public class QuartzJobServiceUtils {
     * @param scheduleJob
     * @throws Exception 
     */
-    public static void pauseJob(final TimedTaskPo scheduleJob) throws Exception {
-        JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroupName());
-        if(jobKey != null) {
-            scheduler.pauseJob(jobKey);
-            // 更新结束时间
-            updateEndTime(scheduleJob);
+    public static boolean pauseJob(TimedTaskPO scheduleJob) throws Exception {
+        boolean retBool1 = false;
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroup());
+        if(jobKey != null && StringUtils.isNumeric(scheduleJob.getOperaStatus())) {
+            Integer start = Integer.parseInt(scheduleJob.getOperaStatus());
+            if(QuartzOperatingStatusEnum.暂停运行.getKey() != start) {
+                scheduler.pauseJob(jobKey);
+                scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.暂停运行.getKey().toString());
+                retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), null, QuartzOperatingStatusEnum.暂停运行);
+            }
         }
-
+        return retBool1;
     }
     
     /** <blockquote>
@@ -147,103 +109,153 @@ public class QuartzJobServiceUtils {
     * @param scheduleJob
     * @throws Exception 
     */
-    public static void resumeJob(final TimedTaskPo scheduleJob) throws Exception {
-        JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroupName());
-        if(jobKey != null) {
-            scheduler.resumeJob(jobKey);
+    public static boolean resumeJob(TimedTaskPO scheduleJob) throws Exception {
+        boolean retBool1 = false;
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroup());
+        if(jobKey != null && StringUtils.isNumeric(scheduleJob.getOperaStatus())) {
+            Integer start = Integer.parseInt(scheduleJob.getOperaStatus());
+            if(QuartzOperatingStatusEnum.正在运行.getKey() != start) {
+                scheduler.resumeJob(jobKey);
+                scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.正在运行.getKey().toString());
+                retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), null, QuartzOperatingStatusEnum.正在运行);
+            }
         }
-
+        return retBool1;
     }
     /** <blockquote>
-     * 重新执行任务任务
+     * 重新执行任务
      * @param scheduleJob
      * @throws Exception 
      */
-     public static void rescheduleJob(final TimedTaskPo scheduleJob) throws Exception {
-         TriggerKey key = TriggerKey.triggerKey(scheduleJob.getName(),scheduleJob.getGroupName());
+     public static boolean rescheduleJob(TimedTaskPO scheduleJob) throws Exception {
+         boolean retBool1 = false;
+         TriggerKey key = TriggerKey.triggerKey(scheduleJob.getName(),scheduleJob.getGroup());
          Trigger trigger = scheduler.getTrigger(key);
-         if(trigger != null){
-             //重新执行
-             scheduler.rescheduleJob(key,trigger);
+         if(trigger != null && StringUtils.isNumeric(scheduleJob.getOperaStatus())){
+             Integer start = Integer.parseInt(scheduleJob.getOperaStatus());
+             if(QuartzOperatingStatusEnum.正在运行.getKey() != start) {
+                 //重新执行
+                 scheduler.rescheduleJob(key,trigger);
+                 scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.正在运行.getKey().toString());
+                 retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), null, QuartzOperatingStatusEnum.正在运行);
+             }
          }
+         return retBool1;
      }
     /** <blockquote>
-    * 删除本地定时任务表的任务并立即停止该任务 
+    * 删除任务 
     * @param scheduleJob - 定时任务实体类
-    * @return - boolean数组 删除本地任务是否成功
+    * @return - boolean 删除本地任务是否成功
     * @throws Exception
     */  
-    public static boolean deleteJob(TimedTaskPo scheduleJob) throws Exception {
-        boolean retBool = false;
+    public static boolean deleteJob(TimedTaskPO scheduleJob) throws Exception {
+        boolean retBool1 = false, retBool2 = false;
         int keyid = isJobPersistence(scheduleJob, true);
-        String time = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
         if(keyid >= 0) {
-            TimedTaskPo tempPo = new TimedTaskPo();
-            tempPo.setId(keyid);
-            tempPo.setJobStatus(QuartzJobStatusEnum.不可用.getKey().toString());
-            tempPo.setEndTime(time);
+            retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), QuartzJobStatusEnum.不可用, QuartzOperatingStatusEnum.停止运行);
+            JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroup());
+            retBool2 = scheduler.deleteJob(jobKey);
+            if(StringUtils.isNumeric(scheduleJob.getJobStatus()) && StringUtils.isNumeric(scheduleJob.getOperaStatus())){
+                Integer start1 = Integer.parseInt(scheduleJob.getJobStatus());
+                Integer start2 = Integer.parseInt(scheduleJob.getOperaStatus());
+                if(QuartzJobStatusEnum.不可用.getKey() != start1) {
+                    scheduleJob.setJobStatus(QuartzJobStatusEnum.不可用.getKey().toString());
+                }
+                if(QuartzOperatingStatusEnum.停止运行.getKey() != start2) {
+                    scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.停止运行.getKey().toString());
+                }
+            }
+        }
+        return retBool1 && retBool2;
+    }
+    
+    /** <blockquote>
+    * 更新对应id的job状态和运行状态
+    * @param id
+    * @param job
+    * @param operating
+    * @return
+    */  
+    public static boolean updateJobAndOperaStatus(Integer id, QuartzJobStatusEnum job, QuartzOperatingStatusEnum operating) {
+        boolean retBool = false;
+        TimedTaskPO tempPo = new TimedTaskPO();
+        tempPo.setId(id);
+        if(job != null) tempPo.setJobStatus(job.getKey().toString());
+        if(operating != null) tempPo.setOperaStatus(operating.getKey().toString());
+        retBool = timedTaskDao.updateOneTimedTask(tempPo) >= 0;
+        return retBool;
+    }
+    
+    /** <blockquote>
+    * 追加对应id的运行次数
+    * @param id
+    * @return
+    */  
+    public static boolean addJobRunCount(Integer id) {
+        boolean retBool = false;
+        TimedTaskPO tempPo = new TimedTaskPO();
+        tempPo.setId(id);
+        List<TimedTaskPO> listTimedTask = timedTaskDao.listTimedTask(tempPo);
+        if(listTimedTask != null && listTimedTask.size() > 0) {
+            tempPo = listTimedTask.get(0);
+            if(StringUtils.isNumeric(tempPo.getRunCount())) {
+                tempPo.setRunCount((Integer.parseInt(tempPo.getRunCount())+ 1)+"");
+            }else {
+                tempPo.setRunCount("1");
+            }
             retBool = timedTaskDao.updateOneTimedTask(tempPo) >= 0;
-            JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroupName());
-            scheduler.deleteJob(jobKey);
+        }else {
+            retBool = false;
         }
         return retBool;
     }
-
+    
+    /** <blockquote>
+    * 追加对应id的运行总时间
+    * @param id - id
+    * @param ss - 毫秒
+    * @return
+    */  
+    public static boolean addJobRunCountDateTime(Integer id, Long ss) {
+        boolean retBool = false;
+        TimedTaskPO tempPo = new TimedTaskPO();
+        tempPo.setId(id);
+        List<TimedTaskPO> listTimedTask = timedTaskDao.listTimedTask(tempPo);
+        if(listTimedTask != null && listTimedTask.size() > 0) {
+            tempPo = listTimedTask.get(0);
+            String date = tempPo.getRunCountDate();
+            if(StringUtils.isNumeric(date)) {
+                tempPo.setRunCountDate((Long.parseLong(date)+ss)+"");
+            }else {
+                tempPo.setRunCountDate(ss != null? ss.toString() : null);
+            }
+            retBool = timedTaskDao.updateOneTimedTask(tempPo) >= 0;
+        }else {
+            retBool = false;
+        }
+        return retBool;
+    }
     /** <blockquote>
     * 立即运行任务 ,只会运行一次
     * @param scheduleJob
     * @throws Exception 
     */
-    public static void runOnce(TimedTaskPo scheduleJob) throws Exception {
-        JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroupName());
+    public static void runOnce(TimedTaskPO scheduleJob) throws Exception {
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroup());
         if(jobKey != null) {
             scheduler.triggerJob(jobKey);
-        }else {
-            
         }
-        // 更新启动时间
-        updateStartTime(scheduleJob);
+        
     }
-    
-    /** <blockquote>
-    * 更新任务的启动时间 
-    * @param scheduleJob
-    * @throws Exception
-    */  
-    public static void updateStartTime(final TimedTaskPo scheduleJob) throws Exception {
-        int keyid = isJobPersistence(scheduleJob, true);
-        String time = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
-        if(keyid >= 0) {
-            TimedTaskPo tempPo = new TimedTaskPo();
-            tempPo.setId(keyid);
-            tempPo.setStartTime(time);
-            timedTaskDao.updateOneTimedTask(tempPo);
-        }
-    }
-    /** <blockquote>
-     * 更新任务的结束时间 
-     * @param scheduleJob
-     * @throws Exception
-     */  
-     public static void updateEndTime(final TimedTaskPo scheduleJob) throws Exception {
-         int keyid = isJobPersistence(scheduleJob, true);
-         String time = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
-         if(keyid >= 0) {
-             TimedTaskPo tempPo = new TimedTaskPo();
-             tempPo.setId(keyid);
-             tempPo.setEndTime(time);
-             timedTaskDao.updateOneTimedTask(tempPo);
-         }
-     }
     /** <blockquote>
     * 更新任务的时间表达式
     * @param scheduleJob
     * @param expression
     * @throws Exception 
     */
-    public static void updateExpression(TimedTaskPo scheduleJob, String expression) throws Exception {
+    public static void updateExpression(TimedTaskPO scheduleJob, String expression) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getName(),
-                scheduleJob.getGroupName());
+                scheduleJob.getGroup());
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(expression);
         trigger = trigger.getTriggerBuilder().withIdentity(triggerKey)
@@ -258,13 +270,13 @@ public class QuartzJobServiceUtils {
     * @return
     * @throws Exception
     */  
-    public static boolean runJob(TimedTaskPo scheduleJob, boolean updateStartTime) throws Exception {
+    public static boolean runJob(TimedTaskPO scheduleJob) throws Exception {
         boolean retBool = false;
-        TriggerKey key = TriggerKey.triggerKey(scheduleJob.getName(),scheduleJob.getGroupName());
+        TriggerKey key = TriggerKey.triggerKey(scheduleJob.getName(),scheduleJob.getGroup());
         Trigger trigger = scheduler.getTrigger(key);
         if(trigger == null){
             //在创建任务时如果不存在新建一个
-            addJobsToScheduler(new TimedTaskPo[] {scheduleJob},new boolean[] {true}, updateStartTime);
+            addJobsToScheduler(new TimedTaskPO[] {scheduleJob},new boolean[] {true});
         }else{
             // Trigger已存在，那么更新相应的定时设置
             //表达式调度构建器
@@ -278,104 +290,103 @@ public class QuartzJobServiceUtils {
         return retBool;
     }
     /** <blockquote>
-    * 将一个定时任务添加到定时任务执行库中
+    * 将一批定时任务添加到定时任务执行库中
     * @param scheduleJobs - 定时任务组
     * @param run - 是否启动
     * @param updateStartTime - 是否更新定时任务组的启动时间
     * @return - 同等数量的是否添加成功
     * @throws Exception
     */  
-    public static boolean[] addJobsToScheduler(TimedTaskPo[] scheduleJobs, boolean[] run, boolean updateStartTime) throws Exception {
+    public static boolean[] addJobsToScheduler(TimedTaskPO[] scheduleJobs, boolean[] run) throws Exception {
         boolean[] retBools = null;
         if(scheduleJobs != null) {
             retBools = new boolean[scheduleJobs.length];
             for(int i = 0,len=scheduleJobs.length; i < len; i++) {
-                TimedTaskPo scheduleJob = scheduleJobs[i];
+                TimedTaskPO scheduleJob = scheduleJobs[i];
                 Trigger trigger = null;
                 // 再创建任务时如果不存在新建一个
                 JobBuilder jobBuilder = JobBuilder.newJob(QuartzJobFactory.class);
-                JobDetail jobDetail = jobBuilder.withIdentity(scheduleJob.getName(),scheduleJob.getGroupName()).build();
+                JobDetail jobDetail = jobBuilder.withIdentity(scheduleJob.getName(),scheduleJob.getGroup()).build();
                 jobDetail.getJobDataMap().put(JOB_DATA_MAP_KET, scheduleJob);
-                String time = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
                 //表达式调度构建器
                 CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCron());
                 //按新的cronExpression表达式构建一个新的trigger
-                trigger = TriggerBuilder.newTrigger().withIdentity(scheduleJob.getName(),scheduleJob.getGroupName())
+                trigger = TriggerBuilder.newTrigger().withIdentity(scheduleJob.getName(),scheduleJob.getGroup())
                         .withSchedule(scheduleBuilder).build();
                 trigger.getJobDataMap().put(JOB_DATA_MAP_KET,scheduleJob);
                 scheduler.scheduleJob(jobDetail, trigger);
-                JobKey jobKey = new JobKey(scheduleJob.getName(),scheduleJob.getGroupName());
+                JobKey jobKey = new JobKey(scheduleJob.getName(),scheduleJob.getGroup());
                 scheduler.pauseJob(jobKey);
+                scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.暂停运行.getKey().toString());
+                // 判断是否需要启动
                 if(i < run.length && run[i]) {
-                    scheduler.resumeJob(jobKey);
-                }
-                // 更新启动时间
-                if(updateStartTime) {
                     // 更新传入实体类的启动时间
-                    scheduleJob.setStartTime(time);
+                    scheduler.resumeJob(jobKey);
+                    scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.正在运行.getKey().toString());
                 }
-            }
-        }
-        return retBools;
-    }
-    /** <blockquote>
-    * 添加任务到定时任务表中并返回同等数量的是否添加成功
-    * @param scheduleJobs - 任务数组
-    * @param run - 是否立即运行
-    * @param updateStartTime - 更新启动时间，已经运行的任务则不会更新
-    * @return - 同等数量的是否添加成功
-    * @throws Exception
-    */  
-    public static boolean[] addJobsToTable(TimedTaskPo[] scheduleJobs, boolean[] run, boolean updateStartTime) throws Exception {
-        boolean[] retBools = null;
-        if(scheduleJobs != null) {
-            retBools = new boolean[scheduleJobs.length];
-            boolean isPersistence = false;
-            for (int i = 0,len=scheduleJobs.length; i < len; i++) {
-                TimedTaskPo po = scheduleJobs[i];
-                isPersistence = isJobPersistence(po, true)>=0;
-                // 该任务不存在任务表中
-                if(!isPersistence) {
-                    // 添加任务
-                   int key = timedTaskDao.addOneTimedTask(po);
-                   if(key >= 0) {
-                       if(i<run.length && run[i]) runJob(po, updateStartTime);
-                       retBools[i] = true;
-                   }else {
-                       retBools[i] = false;
-                   }
+                TimedTaskPO tempTaskPo = new TimedTaskPO();
+                tempTaskPo.setName(scheduleJob.getName());
+                tempTaskPo.setGroup(scheduleJob.getGroup());
+                tempTaskPo.setSysGroup(scheduleJob.getSysGroup());
+                List<TimedTaskPO> listTimedTask = timedTaskDao.listTimedTask(tempTaskPo);
+                // 判断是否已存在表中
+                if(listTimedTask != null && listTimedTask.size() > 0) {
+                    scheduleJob.setId(listTimedTask.get(0).getId());
+                    // 更新
+                    timedTaskDao.updateOneTimedTask(scheduleJob);
                 }else {
-                    if(i<run.length && run[i]) runJob(po, updateStartTime);
-                    retBools[i] = true;
+                    // 添加
+                    timedTaskDao.addOneTimedTask(scheduleJob);
                 }
+                
+                retBools[i] = true;
             }
         }
         return retBools;
     }
     /** <blockquote>
-    * 运行任务表全部的可运行的任务
+    * 运行任务表全部的暂停任务
     * @return
     * @throws Exception 
     */  
-    public static boolean[] runAllJobPersistence() throws Exception {
+    public static boolean[] runAllJobSuspend() throws Exception {
         boolean[] retBools = null;
-        List<TimedTaskPo> poList = timedTaskDao.listTimedTask(null);
-        for (TimedTaskPo po : poList) {
-            if(po != null && StringUtils.isNumeric(po.getOperaStatus()) && QuartzOperatingStatusEnum.停止运行.getKey() != Integer.parseInt(po.getOperaStatus())
-                    && StringUtils.isNumeric(po.getJobStatus()) && QuartzJobStatusEnum.可用.getKey() == Integer.parseInt(po.getJobStatus())) {
-                runJob(po,true);
+        List<TimedTaskPO> poList = timedTaskDao.listTimedTask(null);
+        for (TimedTaskPO po : poList) {
+            if(po != null && StringUtils.isNumeric(po.getOperaStatus()) 
+                    && QuartzOperatingStatusEnum.暂停运行.getKey() == Integer.parseInt(po.getOperaStatus())
+                    && StringUtils.isNumeric(po.getJobStatus()) 
+                    && QuartzJobStatusEnum.可用.getKey() == Integer.parseInt(po.getJobStatus())) {
+                runJob(po);
             }
         }
         return retBools;
     }
-    
+    /** <blockquote>
+     * 运行任务表全部的开机启动任务
+     * @return
+     * @throws Exception 
+     */  
+     public static boolean[] runAllJobSelfStart() throws Exception {
+         boolean[] retBools = null;
+         List<TimedTaskPO> poList = timedTaskDao.listTimedTask(null);
+         for (TimedTaskPO po : poList) {
+             if(po != null && StringUtils.isNumeric(po.getOperaStatus()) 
+                     && "1".equals(po.getSelfStart()) 
+                     && StringUtils.isNumeric(po.getJobStatus()) 
+                     && QuartzJobStatusEnum.可用.getKey() == Integer.parseInt(po.getJobStatus())) {
+                 runJob(po);
+             }
+         }
+         return retBools;
+     }
     /** <blockquote>
     * 获取所有的持久化计划任务 
     * @return
     * @throws Exception
     */  
-    public static List<TimedTaskPo> getJobPersistences() throws Exception{
-        List<TimedTaskPo> retList = timedTaskDao.listTimedTask(null);
+    public static List<TimedTaskPO> getJobPersistences() throws Exception{
+        List<TimedTaskPO> retList = timedTaskDao.listTimedTask(null);
         return retList;
     }
     /** <blockquote>
@@ -385,13 +396,13 @@ public class QuartzJobServiceUtils {
     * @return 任务表对应的id
     * @throws Exception
     */  
-    public static int isJobPersistence(final TimedTaskPo scheduleJob, boolean loose)  throws Exception{
+    public static int isJobPersistence(final TimedTaskPO scheduleJob, boolean loose)  throws Exception{
         int retKeyId = -1;
-        List<TimedTaskPo> poList = null;
+        List<TimedTaskPO> poList = null;
         if (loose) {
-            TimedTaskPo tempPo = new TimedTaskPo();
+            TimedTaskPO tempPo = new TimedTaskPO();
             tempPo.setName(scheduleJob.getName());
-            tempPo.setGroupName(scheduleJob.getGroupName());
+            tempPo.setSysGroup(scheduleJob.getGroup());
             poList = timedTaskDao.listTimedTask(tempPo);
         }else {
             poList = timedTaskDao.listTimedTask(scheduleJob);

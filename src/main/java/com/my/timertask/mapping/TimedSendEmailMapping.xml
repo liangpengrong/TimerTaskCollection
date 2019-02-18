@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.timertask.dao.TimedSendEmailDaoI">
+    <!--更新单条记录 可以获得插入条数主键 主键已经更新到传入的实体类中-->
+    <insert id="addOneTimedSendEmail" parameterType="com.my.timertask.entity.po.TimedSendEmailPO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO t_timed_send_email (`id`,`host`,`username`,`warrant_code`,`port`,`protocol`,`to_user`,`e_title`,`e_content`,`e_type`,`e_annex`,`create_date`,`create_user_id`,`name`,`group`,`sys_group`,`cron`,`start_date`,`stop_date`,`modify_date`,`modify_user_id`)
+        VALUES (#{id},#{host},#{username},#{warrantCode},#{port},#{protocol},#{toUser},#{eTitle},#{eContent},#{eType},#{eAnnex},#{createDate},#{createUserId},#{name},#{group},#{sysGroup},#{cron},#{startDate},#{stopDate},#{modifyDate},#{modifyUserId});
+    </insert>
+    
+    <!--查询nf_customer_ip表并返回结果集 -->
+    <select id="listTimedSendEmail" resultType="com.my.timertask.entity.po.TimedSendEmailPO" parameterType="com.my.timertask.entity.po.TimedSendEmailPO">
+        SELECT * FROM t_timed_send_email <where>
+        <if test=" null != id and '' != id">AND `id` = #{id}</if>
+        <if test=" null != host and '' != host">AND `host` = #{host}</if>
+        <if test=" null != username and '' != username">AND `username` = #{username}</if>
+        <if test=" null != warrantCode and '' != warrantCode">AND `warrant_code` = #{warrantCode}</if>
+        <if test=" null != port and '' != port">AND `port` = #{port}</if>
+        <if test=" null != protocol and '' != protocol">AND `protocol` = #{protocol}</if>
+        <if test=" null != toUser and '' != form">AND `to_user` = #{toUser}</if>
+        <if test=" null != eTitle and '' != eTitle">AND `e_title` = #{eTitle}</if>
+        <if test=" null != eContent and '' != eContent">AND `e_content` = #{eContent}</if>
+        <if test=" null != eType and '' != eType">AND `e_type` = #{eType}</if>
+        <if test=" null != eAnnex and '' != eAnnex">AND `e_annex` = #{eAnnex}</if>
+        <if test=" null != createDate and '' != createDate">AND `create_date` = #{createDate}</if>
+        <if test=" null != createUserId and '' != createUserId">AND `create_user_id` = #{createUserId}</if>
+        <if test=" null != name and '' != name">AND `name` = #{name}</if>
+        <if test=" null != group and '' != group">AND `group` = #{group}</if>
+        <if test=" null != sysGroup and '' != sysGroup">AND `sys_group` = #{sysGroup}</if>
+        <if test=" null != cron and '' != cron">AND `cron` = #{cron}</if>
+        <if test=" null != startDate and '' != startDate">AND `start_date` = #{startDate}</if>
+        <if test=" null != stopDate and '' != stopDate">AND `stop_date` = #{stopDate}</if>
+        <if test=" null != modifyDate and '' != modifyDate">AND `modify_date` = #{modifyDate}</if>
+        <if test=" null != modifyUserId and '' != modifyUserId">AND `modify_user_id` = #{modifyUserId}</if>
+        </where>
+    </select>
+    
+    <!-- 更新单条记录 不更新null 可以获得更新的条数-->
+    <update id="updateOneTimedSendEmail" parameterType="com.my.timertask.entity.po.TimedSendEmailPO">
+        UPDATE t_timed_send_email <set>
+        <if test=" null != host"> `host` = #{host},</if>
+        <if test=" null != username"> `username` = #{username},</if>
+        <if test=" null != warrantCode"> `warrant_code` = #{warrantCode},</if>
+        <if test=" null != port"> `port` = #{port},</if>
+        <if test=" null != protocol"> `protocol` = #{protocol},</if>
+        <if test=" null != toUser"> `to_user` = #{toUser},</if>
+        <if test=" null != eTitle"> `e_title` = #{eTitle},</if>
+        <if test=" null != eContent"> `e_content` = #{eContent},</if>
+        <if test=" null != eType"> `e_type` = #{eType},</if>
+        <if test=" null != eAnnex"> `e_annex` = #{eAnnex},</if>
+        <if test=" null != createDate"> `create_date` = #{createDate},</if>
+        <if test=" null != createUserId"> `create_user_id` = #{createUserId},</if>
+        <if test=" null != name"> `name` = #{name},</if>
+        <if test=" null != group"> `group` = #{group},</if>
+        <if test=" null != sysGroup"> `sys_group` = #{sysGroup},</if>
+        <if test=" null != cron"> `cron` = #{cron},</if>
+        <if test=" null != startDate"> `start_date` = #{startDate},</if>
+        <if test=" null != stopDate"> `stop_date` = #{stopDate},</if>
+        <if test=" null != modifyDate"> `modify_date` = #{modifyDate},</if>
+        <if test=" null != modifyUserId"> `modify_user_id` = #{modifyUserId},</if>
+        </set> where id IN (${id})
+    </update>
+    <!-- 更新单条记录 更新null 可以获得更新的条数-->
+    <update id="updateOneTimedSendEmailHaveNull" parameterType="com.my.timertask.entity.po.TimedSendEmailPO">
+        UPDATE t_timed_send_email <set>
+        `host` = #{host},
+        `username` = #{username},
+        `warrant_code` = #{warrantCode},
+        `port` = #{port},
+        `protocol` = #{protocol},
+        `to_user` = #{toUser},
+        `e_title` = #{eTitle},
+        `e_content` = #{eContent},
+        `e_type` = #{eType},
+        `e_annex` = #{eAnnex},
+        `create_date` = #{createDate},
+        `create_user_id` = #{createUserId},
+        `name` = #{name},
+        `group` = #{group},
+        `sys_group` = #{sysGroup},
+        `cron` = #{cron},
+        `start_date` = #{startDate},
+        `stop_date` = #{stopDate},
+        `modify_date` = #{modifyDate},
+        `modify_user_id` = #{modifyUserId}
+        </set> where id IN (${id})
+    </update>
+</mapper>

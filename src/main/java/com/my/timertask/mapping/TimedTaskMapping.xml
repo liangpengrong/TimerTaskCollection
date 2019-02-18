@@ -4,75 +4,81 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.my.timertask.dao.TimedTaskDaoI">
     <!--更新单条记录 可以获得插入的主键 -->
-    <insert id="addOneTimedTask" parameterType="com.my.timertask.po.TimedTaskPo" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO t_timedtask (id,name,group_name,start_time,end_time,cron,job_status,plan_status,opera_status,job_data,method_name,bean_name,description,create_user_id,create_date,modify_user_id,modify_date)
-        VALUES (#{id},#{name},#{groupName},#{startTime},#{endTime},#{cron},#{jobStatus},#{planStatus},#{operaStatus},#{jobData},#{methodName},#{beanName},#{description},#{createUserId},#{createDate},#{modifyUserId},#{modifyDate});
+    <insert id="addOneTimedTask" parameterType="com.my.timertask.entity.po.TimedTaskPO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO t_timed_task (`id`,`name`,`group`,`sys_group`,`cron`,`start_date`,`stop_date`,`run_count`,`run_count_date`,`job_status`,`opera_status`,`method_data`,`method_data_type`,`method_name`,`bean_name`,`bean_path`,`self_start`,`desc`,`create_date`,`modify_date`)
+        VALUES (#{id},#{name},#{group},#{sysGroup},#{cron},#{startDate},#{stopDate},#{runCount},#{runCountDate},#{jobStatus},#{operaStatus},#{methodData},#{methodDataType},#{methodName},#{beanName},#{beanPath},#{selfStart},#{desc},#{createDate},#{modifyDate});
     </insert>
     
     <!--查询nf_customer_ip表并返回结果集 -->
-    <select id="listTimedTask" resultType="com.my.timertask.po.TimedTaskPo" parameterType="com.my.timertask.po.TimedTaskPo">
-        SELECT * FROM t_timedtask <where>
-        <if test=" null != id and '' != id">AND id = #{id}</if>
-        <if test=" null != name and '' != name">AND name = #{name}</if>
-        <if test=" null != groupName and '' != groupName">AND group_name = #{groupName}</if>
-        <if test=" null != startTime and '' != startTime">AND start_time = #{startTime}</if>
-        <if test=" null != endTime and '' != endTime">AND end_time = #{endTime}</if>
-        <if test=" null != cron and '' != cron">AND cron = #{cron}</if>
-        <if test=" null != jobStatus and '' != jobStatus">AND job_status = #{jobStatus}</if>
-        <if test=" null != planStatus and '' != planStatus">AND plan_status = #{planStatus}</if>
-        <if test=" null != operaStatus and '' != operaStatus">AND opera_status = #{operaStatus}</if>
-        <if test=" null != jobData and '' != jobData">AND job_data = #{jobData}</if>
-        <if test=" null != methodName and '' != methodName">AND method_name = #{methodName}</if>
-        <if test=" null != beanName and '' != beanName">AND bean_name = #{beanName}</if>
-        <if test=" null != description and '' != description">AND description = #{description}</if>
-        <if test=" null != createUserId and '' != createUserId">AND create_user_id = #{createUserId}</if>
-        <if test=" null != createDate and '' != createDate">AND create_date = #{createDate}</if>
-        <if test=" null != modifyUserId and '' != modifyUserId">AND modify_user_id = #{modifyUserId}</if>
-        <if test=" null != modifyDate and '' != modifyDate">AND modify_date = #{modifyDate}</if>
+    <select id="listTimedTask" resultType="com.my.timertask.entity.po.TimedTaskPO" parameterType="com.my.timertask.entity.po.TimedTaskPO">
+        SELECT * FROM t_timed_task <where>
+        <if test=" null != id and '' != id">AND `id` = #{id}</if>
+        <if test=" null != name and '' != name">AND `name` = #{name}</if>
+        <if test=" null != group and '' != group">AND `group` = #{group}</if>
+        <if test=" null != sysGroup and '' != sysGroup">AND `sys_group` = #{sysGroup}</if>
+        <if test=" null != cron and '' != cron">AND `cron` = #{cron}</if>
+        <if test=" null != startDate and '' != startDate">AND `start_date` = #{startDate}</if>
+        <if test=" null != stopDate and '' != stopDate">AND `stop_date` = #{stopDate}</if>
+        <if test=" null != runCount and '' != runCount">AND `run_count` = #{runCount}</if>
+        <if test=" null != runCountDate and '' != runCountDate">AND `run_count_date` = #{runCountDate}</if>
+        <if test=" null != jobStatus and '' != jobStatus">AND `job_status` = #{jobStatus}</if>
+        <if test=" null != operaStatus and '' != operaStatus">AND `opera_status` = #{operaStatus}</if>
+        <if test=" null != methodData and '' != methodData">AND `method_data` = #{methodData}</if>
+        <if test=" null != methodDataType and '' != methodDataType">AND `method_data_type` = #{methodDataType}</if>
+        <if test=" null != methodName and '' != methodName">AND `method_name` = #{methodName}</if>
+        <if test=" null != beanName and '' != beanName">AND `bean_name` = #{beanName}</if>
+        <if test=" null != beanPath and '' != beanPath">AND `bean_path` = #{beanPath}</if>
+        <if test=" null != selfStart and '' != selfStart">AND `self_start` = #{selfStart}</if>
+        <if test=" null != desc and '' != desc">AND `desc` = #{desc}</if>
+        <if test=" null != createDate and '' != createDate">AND `create_date` = #{createDate}</if>
+        <if test=" null != modifyDate and '' != modifyDate">AND `modify_date` = #{modifyDate}</if>
         </where>
     </select>
     
     <!-- 更新单条记录 不更新null 可以获得更新的条数-->
-    <update id="updateOneTimedTask" parameterType="com.my.timertask.po.TimedTaskPo">
-        UPDATE t_timedtask <set>
-        <if test=" null != name">name = #{name},</if>
-        <if test=" null != groupName">group_name = #{groupName},</if>
-        <if test=" null != startTime">start_time = #{startTime},</if>
-        <if test=" null != endTime">end_time = #{endTime},</if>
-        <if test=" null != cron">cron = #{cron},</if>
-        <if test=" null != jobStatus">job_status = #{jobStatus},</if>
-        <if test=" null != planStatus">plan_status = #{planStatus},</if>
-        <if test=" null != operaStatus">opera_status = #{operaStatus},</if>
-        <if test=" null != jobData">job_data = #{jobData},</if>
-        <if test=" null != methodName">method_name = #{methodName},</if>
-        <if test=" null != beanName">bean_name = #{beanName},</if>
-        <if test=" null != description">description = #{description},</if>
-        <if test=" null != createUserId">create_user_id = #{createUserId},</if>
-        <if test=" null != createDate">create_date = #{createDate},</if>
-        <if test=" null != modifyUserId">modify_user_id = #{modifyUserId},</if>
-        <if test=" null != modifyDate">modify_date = #{modifyDate},</if>
+    <update id="updateOneTimedTask" parameterType="com.my.timertask.entity.po.TimedTaskPO">
+        UPDATE t_timed_task <set>
+        <if test=" null != name">`name` = #{name},</if>
+        <if test=" null != group">`group` = #{group},</if>
+        <if test=" null != sysGroup">`sys_group` = #{sysGroup},</if>
+        <if test=" null != cron">`cron` = #{cron},</if>
+        <if test=" null != startDate">`start_date` = #{startDate},</if>
+        <if test=" null != stopDate">`stop_date` = #{stopDate},</if>
+        <if test=" null != runCount">`run_count` = #{runCount},</if>
+        <if test=" null != runCountDate">`run_count_date` = #{runCountDate},</if>
+        <if test=" null != jobStatus">`job_status` = #{jobStatus},</if>
+        <if test=" null != operaStatus">`opera_status` = #{operaStatus},</if>
+        <if test=" null != methodData">`method_data` = #{methodData},</if>
+        <if test=" null != methodDataType">`method_data_type` = #{methodDataType},</if>
+        <if test=" null != methodName">`method_name` = #{methodName},</if>
+        <if test=" null != beanName">`bean_name` = #{beanName},</if>
+        <if test=" null != beanPath">`bean_path` = #{beanPath},</if>
+        <if test=" null != selfStart">`self_start` = #{selfStart},</if>
+        <if test=" null != desc">`desc` = #{desc},</if>
+        <if test=" null != createDate">`create_date` = #{createDate},</if>
+        <if test=" null != modifyDate">`modify_date` = #{modifyDate}</if>
         </set> where id IN (${id})
     </update>
     <!-- 更新单条记录 更新null 可以获得更新的条数-->
-    <update id="updateOneTimedTaskHaveNull" parameterType="com.my.timertask.po.TimedTaskPo">
-        UPDATE t_timedtask <set>
-        id = #{id},
-        name = #{name},
-        group_name = #{groupName},
-        start_time = #{startTime},
-        end_time = #{endTime},
-        cron = #{cron},
-        job_status = #{jobStatus},
-        plan_status = #{planStatus},
-        is_concurrent = #{isConcurrent},
-        job_data = #{jobData},
-        method_name = #{methodName},
-        bean_name = #{beanName},
-        description = #{description},
-        create_user_id = #{createUserId},
-        create_date = #{createDate},
-        modify_user_id = #{modifyUserId},
-        modify_date = #{modifyDate},
+    <update id="updateOneTimedTaskHaveNull" parameterType="com.my.timertask.entity.po.TimedTaskPO">
+        UPDATE t_timed_task <set>
+        `name` = #{name},
+        `group` = #{group},
+        `sys_group` = #{sysGroup},
+        `cron` = #{cron},
+        `start_date` = #{startDate},
+        `stop_date` = #{stopDate},
+        `job_status` = #{jobStatus},
+        `opera_status` = #{operaStatus},
+        `method_data` = #{methodData},
+        `method_data_type` = #{methodDataType},
+        `method_name` = #{methodName},
+        `bean_name` = #{beanName},
+        `bean_path` = #{beanPath},
+        `self_start` = #{selfStart},
+        `desc` = #{desc},
+        `create_date` = #{createDate},
+        `modify_date` = #{modifyDate}
         </set> where id IN (${id})
     </update>
 </mapper>

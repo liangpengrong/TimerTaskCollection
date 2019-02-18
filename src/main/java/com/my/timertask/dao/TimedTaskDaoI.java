@@ -3,7 +3,7 @@ package com.my.timertask.dao;
 
 import java.util.List;
 
-import com.my.timertask.po.TimedTaskPo;
+import com.my.timertask.entity.po.TimedTaskPO;
 
 /** <blockquote>
 * 
@@ -13,29 +13,29 @@ import com.my.timertask.po.TimedTaskPo;
 public interface TimedTaskDaoI {
     
     /** <blockquote>
-    * 插入一条数据并返回主键 
+    * 插入一条数据 可以获得插入条数 主键已经更新到传入的实体类中
     * @param po
     * @return
     */  
-    int addOneTimedTask(TimedTaskPo po);
+    int addOneTimedTask(TimedTaskPO po);
     
     /** <blockquote>
     * 查询数据并返回list集合 
     * @param po
     * @return
     */  
-    List<TimedTaskPo> listTimedTask(TimedTaskPo po);
+    List<TimedTaskPO> listTimedTask(TimedTaskPO po);
 
     /** <blockquote>
     * 更新一条数据 不更新null
     * @param po
     * @return
     */  
-    int updateOneTimedTask(TimedTaskPo po);
+    int updateOneTimedTask(TimedTaskPO po);
     /** <blockquote>
      * 更新一条数据  更新null
      * @param po
      * @return
      */  
-    int updateOneTimedTaskHaveNull(TimedTaskPo po);
+    int updateOneTimedTaskHaveNull(TimedTaskPO po);
 }

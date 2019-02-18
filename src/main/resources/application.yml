@@ -5,22 +5,34 @@ server:
         # 配置访问路径添加项目名称
         context-path: /TimerTaskCollection
 mybatis: 
-    #配置mybatis扫描的mapp xml路径
+    # 配置mybatis扫描的mapp xml路径
     mapper-locations: classpath*:com/my/timertask/mapping/*.xml
     configuration:
         map-underscore-to-camel-case: true
-    #配置分页插件参数
+    # 配置分页插件参数
     page-helper: 
         properties: 
             reasonable: true
             offsetAsPageNum: true
             rowBoundsWithCount: true
             dialect: mysql
+spring:
+  h2: 
+    console: 
+      settings: 
+        web-allow-others: true
+        trace: true
+      #console url
+      path: /h2-console
+     #default true
+      enabled: true
 datasource: 
     url: jdbc:mysql://127.0.0.1:3306/mytest?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
+    # url: jdbc:h2:~/TimerTaskCollection/devdb
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+    # driver-class-name: org.h2.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     initialSize: 50
     # 最小连接数
@@ -69,4 +81,5 @@ mail:
     protocol: smtp
     properties.mail.smtp.auth: true
     properties.mail.smtp.ssl.enable: true
+    
     

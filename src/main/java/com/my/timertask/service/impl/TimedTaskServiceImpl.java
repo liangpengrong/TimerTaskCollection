@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.my.timertask.dao.TimedTaskDaoI;
-import com.my.timertask.po.TimedTaskPo;
+import com.my.timertask.entity.po.TimedTaskPO;
 import com.my.timertask.service.inter.TimedTaskServiceI;
 
 @Service
@@ -17,14 +17,14 @@ public class TimedTaskServiceImpl implements TimedTaskServiceI {
     @Autowired
     private TimedTaskDaoI timedTaskDao;
     @Override
-    public int addTimedTask(TimedTaskPo po) {
+    public int addTimedTask(TimedTaskPO po) {
         int key = -1;
         key = timedTaskDao.addOneTimedTask(po);
         return key;
     }
     @Override
-    public List<TimedTaskPo> getTimedTaskList(TimedTaskPo po) {
-        List<TimedTaskPo> daTaskPos = timedTaskDao.listTimedTask(po);
+    public List<TimedTaskPO> getTimedTaskList(TimedTaskPO po) {
+        List<TimedTaskPO> daTaskPos = timedTaskDao.listTimedTask(po);
         return daTaskPos;
     }
 

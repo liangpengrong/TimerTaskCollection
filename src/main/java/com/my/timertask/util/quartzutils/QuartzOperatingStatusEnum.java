@@ -6,10 +6,9 @@ package com.my.timertask.util.quartzutils;
 * @date [2019-01-21 16:20:47]
 */
 public enum QuartzOperatingStatusEnum {
-    立即运行(0)
-    , 正在运行(1)
+    正在运行(1)
     , 暂停运行(2)
-    , 停止运行(3)
+    , 停止运行(0)
     ;
     private int key;
     private QuartzOperatingStatusEnum(Integer key) {
@@ -20,5 +19,20 @@ public enum QuartzOperatingStatusEnum {
     */
     public Integer getKey() {
         return key;
+    }
+    /** <blockquote>
+    * 通过key查找对应的枚举 
+    * @return
+    */  
+    public static QuartzOperatingStatusEnum getEnumByKey(Integer key) {
+        QuartzOperatingStatusEnum enum1 = null;
+        QuartzOperatingStatusEnum[] all = QuartzOperatingStatusEnum.class.getEnumConstants();
+        for(QuartzOperatingStatusEnum ee : all) {
+            if(ee.getKey().equals(key)) {
+                enum1 = ee;
+                break;
+            }
+        }
+        return enum1;
     }
 }

@@ -35,7 +35,6 @@ public class QuartzConfug {
             factoryBean.setApplicationContext(applicationContext);
             factoryBean.setApplicationContextSchedulerContextKey("applicationContext");
             factoryBean.setOverwriteExistingJobs(true);
-            
             // 设置线程池属性
             quartzProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
             quartzProperties.setProperty("org.quartz.threadPool.threadCount", "15");
