@@ -1,0 +1,45 @@
+datasource: 
+  url: jdbc:mysql://127.0.0.1:3306/mytest?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
+  # url: jdbc:h2:~/TimerTaskCollection/devdb
+  username: root
+  password: root
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  # driver-class-name: org.h2.Driver
+  type: com.alibaba.druid.pool.DruidDataSource
+  initialSize: 50
+  # 最小连接数
+  minIdle: 2
+  # 最大连接数
+  maxActive: 500
+  # 连接等待超时的时间
+  maxWait: 6000
+  # 间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+  timeBetweenEvictionRunsMillis: 6000
+  # 连接在池中最小生存的时间，单位是毫秒
+  minEvictableIdleTimeMillis: 30000
+  # SQL查询,用来验证从连接池取出的连接
+  validationQuery: SELECT 1
+  # 申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效
+  testWhileIdle: true
+  testOnBorrow: false
+  testOnReturn: false
+  # 打开PSCache，并且指定每个连接上PSCache的大小
+  poolPreparedStatements: true
+  maxPoolPreparedStatementPerConnectionSize: 20
+  # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+  filters: stat,wall,slf4j
+  # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+  connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  # 合并多个DruidDataSource的监控数据
+  useGlobalDataSourceStat: true
+  # 
+  druidServlet: 
+      # Druid监控界面登陆拦截路径
+      loginfilter: /druid/*
+      # Druid监控界面登陆用户名
+      loginuser: admin
+      # Druid监控界面登陆密码
+      loginpass: admin
+  jmx: 
+      enabled: false
+      

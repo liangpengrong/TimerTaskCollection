@@ -1,0 +1,11 @@
+mail: 
+  host: smtp.qq.com
+  # 发送方的邮箱
+  username: 575989285@qq.com
+  # 对于qq邮箱而言 密码指的就是发送方的授权码
+  password: ttgsycqqbiisbdjf
+  default-encoding: UTF-8
+  port: 465
+  protocol: smtp
+  properties.mail.smtp.auth: true
+  properties.mail.smtp.ssl.enable: true

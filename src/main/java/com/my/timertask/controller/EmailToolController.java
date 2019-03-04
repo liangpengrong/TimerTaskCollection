@@ -1,7 +1,10 @@
 package com.my.timertask.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.my.timertask.config.QuartzConfug;
+import com.my.timertask.entity.po.TimedTaskPO;
 import com.my.timertask.entity.vo.TimedSendEmailVo;
 import com.my.timertask.service.inter.TimedSendEmailServiceI;
 import com.my.timertask.util.enumdata.EmailTypeEnum;
+import com.my.timertask.util.quartzutils.QuartzJobServiceUtils;
 
 @Controller
 @RequestMapping("emailToolController")
@@ -30,7 +35,7 @@ public class EmailToolController {
         String code = "1";
         String mess = "成功";
         try {
-            vo = new TimedSendEmailVo();
+            /*vo = new TimedSendEmailVo();
             vo.setTimdeName("啊啊啊啊");
             vo.setHost("smtp.qq.com");
             vo.setUsername("575989285@qq.com");
@@ -51,12 +56,20 @@ public class EmailToolController {
             if(!bool) {
                 code = "0";
                 mess = "失败";
-            }
+            }*/
+            List<TimedTaskPO> jobPersistences = QuartzJobServiceUtils.getJobPersistences();
+            TimedTaskPO timedTaskPO = jobPersistences.get(0);
+            timedTaskPO.setBeanPath(timedTaskPO.getBeanPath().replace(System.lineSeparator()+System.lineSeparator(), ""));
+            jobPersistences.set(0, timedTaskPO);
+            System.out.println(timedTaskPO.getBeanPath());
+            json.put("data", jobPersistences);
+            json.put("换行符", System.lineSeparator());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             code = "0";
             mess = "失败";
         }
+        
         json.put("code", code);
         json.put("mess", mess);
         return json;

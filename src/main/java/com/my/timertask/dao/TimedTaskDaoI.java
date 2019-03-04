@@ -3,6 +3,8 @@ package com.my.timertask.dao;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
+
 import com.my.timertask.entity.po.TimedTaskPO;
 
 /** <blockquote>
@@ -24,6 +26,7 @@ public interface TimedTaskDaoI {
     * @param po
     * @return
     */  
+    // @Cacheable(cacheNames="listTimedTask", key="#root.caches[0].name" )
     List<TimedTaskPO> listTimedTask(TimedTaskPO po);
 
     /** <blockquote>
