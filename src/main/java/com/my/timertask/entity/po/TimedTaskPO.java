@@ -258,32 +258,6 @@ public class TimedTaskPO implements Serializable {
         this.modifyDate = modifyDate;
     }
 
-    /** <blockquote> 自动生成的深克隆方法，将对象中的每项进行深克隆 */
-    public TimedTaskPO DeepCloning() {
-        TimedTaskPO tempEntity= new TimedTaskPO();
-        tempEntity.setId(new Integer(this.id));
-        tempEntity.setName(new String(this.name));
-        tempEntity.setGroup(new String(this.group));
-        tempEntity.setSysGroup(new String(this.sysGroup));
-        tempEntity.setCron(new String(this.cron));
-        tempEntity.setStartDate(new String(this.startDate));
-        tempEntity.setStopDate(new String(this.stopDate));
-        tempEntity.setRunCount(new String(this.runCount));
-        tempEntity.setRunCountDate(new String(this.runCountDate));
-        tempEntity.setJobStatus(new String(this.jobStatus));
-        tempEntity.setOperaStatus(new String(this.operaStatus));
-        tempEntity.setMethodData(new String(this.methodData));
-        tempEntity.setMethodDataType(new String(this.methodDataType));
-        tempEntity.setMethodName(new String(this.methodName));
-        tempEntity.setBeanName(new String(this.beanName));
-        tempEntity.setBeanPath(new String(this.beanPath));
-        tempEntity.setSelfStart(new String(this.selfStart));
-        tempEntity.setDesc(new String(this.desc));
-        tempEntity.setCreateDate(new String(this.createDate));
-        tempEntity.setModifyDate(new String(this.modifyDate));
-        return tempEntity;
-    }
-
     /** 重写后的toString方法 */
     @Override
     public String toString() {

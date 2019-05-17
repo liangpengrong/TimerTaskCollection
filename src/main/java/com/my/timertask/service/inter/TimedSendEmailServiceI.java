@@ -1,8 +1,7 @@
 package com.my.timertask.service.inter;
 
-import com.my.timertask.entity.po.TimedSendEmailPO;
 import com.my.timertask.entity.vo.TimedSendEmailVo;
-import com.my.timertask.util.enumdata.EmailTypeEnum;
+import com.my.timertask.util.email.EmailTypeEnum;
 
 public interface TimedSendEmailServiceI {
     

@@ -1,0 +1,34 @@
+spring: 
+  rabbitmq: 
+    host: 127.0.0.1
+    port: 5672
+    username: root
+    password: root
+    # 虚拟主机(一个RabbitMQ服务可以配置多个虚拟主机，每一个虚拟机主机之间是相互隔离，相互独立的，授权用户到指定的virtual-host就可以发送消息到指定队列)
+    virtual-host: /
+    # 消息发送确认回调
+    publisher-confirms: true
+    # 消息发送失败回调
+    publisher-returns: true
+    connection: 
+      timeout: 15000s
+    # RabbitMQ监听配置
+    listener: 
+      simple: 
+        # 初始并发量
+        concurrency: 5
+        # 最大并发量
+        max-concurrency: 15 
+        # 签收模式，auto:自动，manual:手工
+        acknowledge-mode: manual
+        # 最多一次消费多少条数据 -限流
+        prefetch: 1 
+        retry: 
+          # 是否支持重试
+          enabled: true
+          # 最大重试次数
+          max-attempts: 5
+          # 重试间隔时间（单位毫秒）
+          initial-interval: 5000
+        # 重试次数超过上面的设置之后是否丢弃（false不丢弃时需要写相应代码将该消息加入死信队列）
+        default-requeue-rejected: false 

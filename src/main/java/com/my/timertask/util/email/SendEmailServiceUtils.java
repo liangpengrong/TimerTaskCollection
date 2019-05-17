@@ -1,4 +1,4 @@
-package com.my.timertask.util;
+package com.my.timertask.util.email;
 
 import java.io.File;
 import java.util.Properties;
@@ -18,6 +18,7 @@ import com.my.timertask.entity.dto.SendEmailDTO;
 
 @Component
 public class SendEmailServiceUtils {
+    private SendEmailServiceUtils() {}
     private static JavaMailSenderImpl thisMailSender;
     private static JavaMailSenderImpl initJavaMailSender(final SendEmailDTO mail) {
         JavaMailSenderImpl mailSender = null;

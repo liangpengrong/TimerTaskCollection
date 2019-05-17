@@ -7,6 +7,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -18,17 +20,24 @@ import com.my.timertask.entity.po.TimedSendEmailPO;
 import com.my.timertask.entity.po.TimedTaskPO;
 import com.my.timertask.entity.vo.TimedSendEmailVo;
 import com.my.timertask.service.inter.TimedSendEmailServiceI;
-import com.my.timertask.util.SendEmailServiceUtils;
-import com.my.timertask.util.enumdata.EmailTypeEnum;
+import com.my.timertask.util.email.EmailTypeEnum;
+import com.my.timertask.util.email.SendEmailServiceUtils;
 import com.my.timertask.util.enumdata.TimedSysGroupEnum;
 import com.my.timertask.util.quartzutils.QuartzJobServiceUtils;
 import com.my.timertask.util.quartzutils.QuartzJobStatusEnum;
+import com.my.timertask.util.rabbitmq.RabbitMQSendServiceUtils;
 
 @Service
 public class TimedSendEmailServiceImpl implements TimedSendEmailServiceI {
     private static Logger logger = LoggerFactory.getLogger(TimedSendEmailServiceImpl.class);
     @Value("${mail.default-encoding}")
     private String mailencoding;
+    @Value("${mq.config.exchanger.log-exchanger}")
+    private String key1;
+    @Value("${mq.config.queue.log-info-routingkey}")
+    private String routingkey1;
+    @Value("${mq.config.queue.log-error-routingkey}")
+    private String routingkey2;
     @Autowired
     private ApplicationContext appContent;
     @Autowired
@@ -69,12 +78,22 @@ public class TimedSendEmailServiceImpl implements TimedSendEmailServiceI {
             po.setModifyDate(null);
             po.setModifyUserId(null);
             // 保存到配置表中
-            int count = timedSendEmainDaoI.addOneTimedSendEmail(po);
+            // int count = timedSendEmainDaoI.addOneTimedSendEmail(po);
             // 加入到定时任务表中并判断是否启动
-            if(count > 0 ) {
+            /*if(count > 0 ) {
                 issend = addEmailJobs(po, vo.getRun(), vo.getSelfRun());
+            }*/
+            // 放入消息队列
+            if(true) {
+                while (true) {
+                    Thread.sleep(1000);
+                    TimedSendEmailPO ppp1 = new TimedSendEmailPO(), ppp2 = new TimedSendEmailPO();
+                    BeanUtils.copyProperties(po, ppp1);
+                    BeanUtils.copyProperties(po, ppp2);
+                    boolean send = RabbitMQSendServiceUtils.send(key1, "", ppp1);
+                }
+                //boolean send2 = RabbitMQSendServiceUtils.send(key1, routingkey2, ppp2);
             }
-
         } catch (Exception e) {
             logger.error("", e);
             e.printStackTrace();

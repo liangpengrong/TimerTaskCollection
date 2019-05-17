@@ -1,8 +1,6 @@
 package com.my.timertask.util.quartzutils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -18,22 +16,20 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.my.timertask.dao.TimedTaskDaoI;
 import com.my.timertask.entity.po.TimedTaskPO;
+import com.my.timertask.util.bean.BeanFactoryUtils;
 
 @Component
 public class QuartzJobServiceUtils {
     public static final String JOB_DATA_MAP_KET = "scheduleJob";
-    private static Scheduler scheduler;
-    private static TimedTaskDaoI timedTaskDao;
-    @Autowired
-    public QuartzJobServiceUtils(Scheduler scheduler, TimedTaskDaoI timedTaskDao, ApplicationContext applicationContext) {
-        QuartzJobServiceUtils.scheduler = scheduler;
-        QuartzJobServiceUtils.timedTaskDao = timedTaskDao;
+    private static Scheduler getScheduler() {
+        return BeanFactoryUtils.getBean(Scheduler.class);
+    }
+    private static TimedTaskDaoI getTimedTaskDao() {
+        return BeanFactoryUtils.getBean(TimedTaskDaoI.class);
     }
     
     /** <blockquote>
@@ -43,13 +39,13 @@ public class QuartzJobServiceUtils {
     */
     public static List<TimedTaskPO> getPlanJobs() throws Exception {
         GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
-        Set<JobKey> jobKeys = scheduler.getJobKeys(matcher);
+        Set<JobKey> jobKeys = getScheduler().getJobKeys(matcher);
         List<TimedTaskPO> jobList = new ArrayList<TimedTaskPO>();
         for(JobKey jobKey  : jobKeys){
-            List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
+            List<? extends Trigger> triggers = getScheduler().getTriggersOfJob(jobKey);
             for (Trigger trigger : triggers){
                 TimedTaskPO job = (TimedTaskPO) trigger.getJobDataMap().get(JOB_DATA_MAP_KET);
-                Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+                Trigger.TriggerState triggerState = getScheduler().getTriggerState(trigger.getKey());
                 job.setJobStatus(triggerState.name());
                 if (trigger instanceof CronTrigger) {
                     CronTrigger cronTrigger = (CronTrigger) trigger;
@@ -68,12 +64,12 @@ public class QuartzJobServiceUtils {
     * @throws Exception 
     */
     public static List<TimedTaskPO> getRunningJobs() throws Exception {
-        List<JobExecutionContext> executingJobs = scheduler.getCurrentlyExecutingJobs();
+        List<JobExecutionContext> executingJobs = getScheduler().getCurrentlyExecutingJobs();
         List<TimedTaskPO> jobList = new ArrayList<TimedTaskPO>();
         for (JobExecutionContext executingJob : executingJobs){
             Trigger trigger = executingJob.getTrigger();
             TimedTaskPO job = (TimedTaskPO) trigger.getJobDataMap().get(JOB_DATA_MAP_KET);
-            Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+            Trigger.TriggerState triggerState = getScheduler().getTriggerState(trigger.getKey());
             job.setJobStatus(triggerState.name());
             if (trigger instanceof CronTrigger) {
                 CronTrigger cronTrigger = (CronTrigger) trigger;
@@ -96,7 +92,7 @@ public class QuartzJobServiceUtils {
         if(jobKey != null && StringUtils.isNumeric(scheduleJob.getOperaStatus())) {
             Integer start = Integer.parseInt(scheduleJob.getOperaStatus());
             if(QuartzOperatingStatusEnum.暂停运行.getKey() != start) {
-                scheduler.pauseJob(jobKey);
+                getScheduler().pauseJob(jobKey);
                 scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.暂停运行.getKey().toString());
                 retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), null, QuartzOperatingStatusEnum.暂停运行);
             }
@@ -115,7 +111,7 @@ public class QuartzJobServiceUtils {
         if(jobKey != null && StringUtils.isNumeric(scheduleJob.getOperaStatus())) {
             Integer start = Integer.parseInt(scheduleJob.getOperaStatus());
             if(QuartzOperatingStatusEnum.正在运行.getKey() != start) {
-                scheduler.resumeJob(jobKey);
+                getScheduler().resumeJob(jobKey);
                 scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.正在运行.getKey().toString());
                 retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), null, QuartzOperatingStatusEnum.正在运行);
             }
@@ -130,12 +126,12 @@ public class QuartzJobServiceUtils {
      public static boolean rescheduleJob(TimedTaskPO scheduleJob) throws Exception {
          boolean retBool1 = false;
          TriggerKey key = TriggerKey.triggerKey(scheduleJob.getName(),scheduleJob.getGroup());
-         Trigger trigger = scheduler.getTrigger(key);
+         Trigger trigger = getScheduler().getTrigger(key);
          if(trigger != null && StringUtils.isNumeric(scheduleJob.getOperaStatus())){
              Integer start = Integer.parseInt(scheduleJob.getOperaStatus());
              if(QuartzOperatingStatusEnum.正在运行.getKey() != start) {
                  //重新执行
-                 scheduler.rescheduleJob(key,trigger);
+                 getScheduler().rescheduleJob(key,trigger);
                  scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.正在运行.getKey().toString());
                  retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), null, QuartzOperatingStatusEnum.正在运行);
              }
@@ -154,7 +150,7 @@ public class QuartzJobServiceUtils {
         if(keyid >= 0) {
             retBool1 = updateJobAndOperaStatus(scheduleJob.getId(), QuartzJobStatusEnum.不可用, QuartzOperatingStatusEnum.停止运行);
             JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroup());
-            retBool2 = scheduler.deleteJob(jobKey);
+            retBool2 = getScheduler().deleteJob(jobKey);
             if(StringUtils.isNumeric(scheduleJob.getJobStatus()) && StringUtils.isNumeric(scheduleJob.getOperaStatus())){
                 Integer start1 = Integer.parseInt(scheduleJob.getJobStatus());
                 Integer start2 = Integer.parseInt(scheduleJob.getOperaStatus());
@@ -182,7 +178,7 @@ public class QuartzJobServiceUtils {
         tempPo.setId(id);
         if(job != null) tempPo.setJobStatus(job.getKey().toString());
         if(operating != null) tempPo.setOperaStatus(operating.getKey().toString());
-        retBool = timedTaskDao.updateOneTimedTask(tempPo) >= 0;
+        retBool = getTimedTaskDao().updateOneTimedTask(tempPo) >= 0;
         return retBool;
     }
     
@@ -195,7 +191,7 @@ public class QuartzJobServiceUtils {
         boolean retBool = false;
         TimedTaskPO tempPo = new TimedTaskPO();
         tempPo.setId(id);
-        List<TimedTaskPO> listTimedTask = timedTaskDao.listTimedTask(tempPo);
+        List<TimedTaskPO> listTimedTask = getTimedTaskDao().listTimedTask(tempPo);
         if(listTimedTask != null && listTimedTask.size() > 0) {
             tempPo = listTimedTask.get(0);
             if(StringUtils.isNumeric(tempPo.getRunCount())) {
@@ -203,7 +199,7 @@ public class QuartzJobServiceUtils {
             }else {
                 tempPo.setRunCount("1");
             }
-            retBool = timedTaskDao.updateOneTimedTask(tempPo) >= 0;
+            retBool = getTimedTaskDao().updateOneTimedTask(tempPo) >= 0;
         }else {
             retBool = false;
         }
@@ -220,7 +216,7 @@ public class QuartzJobServiceUtils {
         boolean retBool = false;
         TimedTaskPO tempPo = new TimedTaskPO();
         tempPo.setId(id);
-        List<TimedTaskPO> listTimedTask = timedTaskDao.listTimedTask(tempPo);
+        List<TimedTaskPO> listTimedTask = getTimedTaskDao().listTimedTask(tempPo);
         if(listTimedTask != null && listTimedTask.size() > 0) {
             tempPo = listTimedTask.get(0);
             String date = tempPo.getRunCountDate();
@@ -229,7 +225,7 @@ public class QuartzJobServiceUtils {
             }else {
                 tempPo.setRunCountDate(ss != null? ss.toString() : null);
             }
-            retBool = timedTaskDao.updateOneTimedTask(tempPo) >= 0;
+            retBool = getTimedTaskDao().updateOneTimedTask(tempPo) >= 0;
         }else {
             retBool = false;
         }
@@ -243,7 +239,7 @@ public class QuartzJobServiceUtils {
     public static void runOnce(TimedTaskPO scheduleJob) throws Exception {
         JobKey jobKey = JobKey.jobKey(scheduleJob.getName(), scheduleJob.getGroup());
         if(jobKey != null) {
-            scheduler.triggerJob(jobKey);
+            getScheduler().triggerJob(jobKey);
         }
         
     }
@@ -256,11 +252,11 @@ public class QuartzJobServiceUtils {
     public static void updateExpression(TimedTaskPO scheduleJob, String expression) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getName(),
                 scheduleJob.getGroup());
-        CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+        CronTrigger trigger = (CronTrigger) getScheduler().getTrigger(triggerKey);
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(expression);
         trigger = trigger.getTriggerBuilder().withIdentity(triggerKey)
                 .withSchedule(scheduleBuilder).build();
-        scheduler.rescheduleJob(triggerKey, trigger);
+        getScheduler().rescheduleJob(triggerKey, trigger);
     }
     
     /** <blockquote>
@@ -273,7 +269,7 @@ public class QuartzJobServiceUtils {
     public static boolean runJob(TimedTaskPO scheduleJob) throws Exception {
         boolean retBool = false;
         TriggerKey key = TriggerKey.triggerKey(scheduleJob.getName(),scheduleJob.getGroup());
-        Trigger trigger = scheduler.getTrigger(key);
+        Trigger trigger = getScheduler().getTrigger(key);
         if(trigger == null){
             //在创建任务时如果不存在新建一个
             addJobsToScheduler(new TimedTaskPO[] {scheduleJob},new boolean[] {true});
@@ -284,7 +280,7 @@ public class QuartzJobServiceUtils {
             trigger = TriggerBuilder.newTrigger().withIdentity(key).withSchedule(scheduleBuilder).build();
             trigger.getJobDataMap().put(JOB_DATA_MAP_KET, scheduleJob);
             //重新执行
-            scheduler.rescheduleJob(key,trigger);
+            getScheduler().rescheduleJob(key,trigger);
         }
         retBool = true;
         return retBool;
@@ -314,29 +310,29 @@ public class QuartzJobServiceUtils {
                 trigger = TriggerBuilder.newTrigger().withIdentity(scheduleJob.getName(),scheduleJob.getGroup())
                         .withSchedule(scheduleBuilder).build();
                 trigger.getJobDataMap().put(JOB_DATA_MAP_KET,scheduleJob);
-                scheduler.scheduleJob(jobDetail, trigger);
+                getScheduler().scheduleJob(jobDetail, trigger);
                 JobKey jobKey = new JobKey(scheduleJob.getName(),scheduleJob.getGroup());
-                scheduler.pauseJob(jobKey);
+                getScheduler().pauseJob(jobKey);
                 scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.暂停运行.getKey().toString());
                 // 判断是否需要启动
                 if(i < run.length && run[i]) {
                     // 更新传入实体类的启动时间
-                    scheduler.resumeJob(jobKey);
+                    getScheduler().resumeJob(jobKey);
                     scheduleJob.setOperaStatus(QuartzOperatingStatusEnum.正在运行.getKey().toString());
                 }
                 TimedTaskPO tempTaskPo = new TimedTaskPO();
                 tempTaskPo.setName(scheduleJob.getName());
                 tempTaskPo.setGroup(scheduleJob.getGroup());
                 tempTaskPo.setSysGroup(scheduleJob.getSysGroup());
-                List<TimedTaskPO> listTimedTask = timedTaskDao.listTimedTask(tempTaskPo);
+                List<TimedTaskPO> listTimedTask = getTimedTaskDao().listTimedTask(tempTaskPo);
                 // 判断是否已存在表中
                 if(listTimedTask != null && listTimedTask.size() > 0) {
                     scheduleJob.setId(listTimedTask.get(0).getId());
                     // 更新
-                    timedTaskDao.updateOneTimedTask(scheduleJob);
+                    getTimedTaskDao().updateOneTimedTask(scheduleJob);
                 }else {
                     // 添加
-                    timedTaskDao.addOneTimedTask(scheduleJob);
+                    getTimedTaskDao().addOneTimedTask(scheduleJob);
                 }
                 
                 retBools[i] = true;
@@ -351,7 +347,7 @@ public class QuartzJobServiceUtils {
     */  
     public static boolean[] runAllJobSuspend() throws Exception {
         boolean[] retBools = null;
-        List<TimedTaskPO> poList = timedTaskDao.listTimedTask(null);
+        List<TimedTaskPO> poList = getTimedTaskDao().listTimedTask(null);
         for (TimedTaskPO po : poList) {
             if(po != null && StringUtils.isNumeric(po.getOperaStatus()) 
                     && QuartzOperatingStatusEnum.暂停运行.getKey() == Integer.parseInt(po.getOperaStatus())
@@ -369,7 +365,7 @@ public class QuartzJobServiceUtils {
      */  
      public static boolean[] runAllJobSelfStart() throws Exception {
          boolean[] retBools = null;
-         List<TimedTaskPO> poList = timedTaskDao.listTimedTask(null);
+         List<TimedTaskPO> poList = getTimedTaskDao().listTimedTask(null);
          for (TimedTaskPO po : poList) {
              if(po != null && StringUtils.isNumeric(po.getOperaStatus()) 
                      && "1".equals(po.getSelfStart()) 
@@ -386,7 +382,7 @@ public class QuartzJobServiceUtils {
     * @throws Exception
     */  
     public static List<TimedTaskPO> getJobPersistences() throws Exception{
-        List<TimedTaskPO> retList = timedTaskDao.listTimedTask(null);
+        List<TimedTaskPO> retList = getTimedTaskDao().listTimedTask(null);
         return retList;
     }
     /** <blockquote>
@@ -403,9 +399,9 @@ public class QuartzJobServiceUtils {
             TimedTaskPO tempPo = new TimedTaskPO();
             tempPo.setName(scheduleJob.getName());
             tempPo.setSysGroup(scheduleJob.getGroup());
-            poList = timedTaskDao.listTimedTask(tempPo);
+            poList = getTimedTaskDao().listTimedTask(tempPo);
         }else {
-            poList = timedTaskDao.listTimedTask(scheduleJob);
+            poList = getTimedTaskDao().listTimedTask(scheduleJob);
         }
         retKeyId = poList != null && poList.size() > 0? poList.get(0).getId():-1;
         return retKeyId;

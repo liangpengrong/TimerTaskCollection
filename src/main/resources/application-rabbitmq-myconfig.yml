@@ -1,0 +1,10 @@
+mq: 
+  config: 
+    # 交换器名称
+    exchanger: 
+      log-exchanger: log.exchanger # 日志路由器
+    queue: 
+      log-info: log.info # info日志的消息队列
+      log-info-routingkey: log.info.routing.key
+      log-error: log.error # error日志的消息队列
+      log-error-routingkey: log.error.routing.key

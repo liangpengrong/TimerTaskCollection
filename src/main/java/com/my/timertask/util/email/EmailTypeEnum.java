@@ -1,4 +1,4 @@
-package com.my.timertask.util.enumdata;
+package com.my.timertask.util.email;
 
 public enum EmailTypeEnum {
     普通类型邮件("1000")

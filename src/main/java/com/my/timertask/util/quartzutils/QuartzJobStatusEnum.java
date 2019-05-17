@@ -1,6 +1,6 @@
 package com.my.timertask.util.quartzutils;
 
-import com.my.timertask.util.enumdata.EmailTypeEnum;
+import com.my.timertask.util.email.EmailTypeEnum;
 
 /** <blockquote>
 * 定时任务状态 
