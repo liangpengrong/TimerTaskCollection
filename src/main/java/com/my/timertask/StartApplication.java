@@ -16,7 +16,11 @@ import org.springframework.cache.annotation.EnableCaching;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+<<<<<<< HEAD
 @SpringBootApplication
+=======
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, MybatisAutoConfiguration.class})
+>>>>>>> 本地
 // 启用Swagger2
 @EnableSwagger2
 // 启用自动配置
