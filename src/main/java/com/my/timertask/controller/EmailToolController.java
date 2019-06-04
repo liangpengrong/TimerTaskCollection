@@ -36,7 +36,7 @@ public class EmailToolController {
         String mess = "成功";
         try {
             vo = new TimedSendEmailVo();
-            vo.setTimdeName("啊啊啊啊");
+            vo.setTimdeName("啊啊啊啊啊");
             vo.setHost("smtp.qq.com");
             vo.setUsername("575989285@qq.com");
             vo.setWarrantCode("ttgsycqqbiisbdjf");
