@@ -59,7 +59,7 @@ public class EmailToolController {
             }*/
             List<TimedTaskPO> jobPersistences = QuartzJobServiceUtils.getJobPersistences();
             TimedTaskPO timedTaskPO = jobPersistences.get(0);
-            timedTaskPO.setBeanPath(timedTaskPO.getBeanPath().replace(System.lineSeparator()+System.lineSeparator(), ""));
+            timedTaskPO.setBeanPath(timedTaskPO.getBeanPath().replace("\r\n\r\n", "").replace("\n\n", "").replace("\r\r", ""));
             jobPersistences.set(0, timedTaskPO);
             System.out.println(timedTaskPO.getBeanPath());
             json.put("data", jobPersistences);

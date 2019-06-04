@@ -6,7 +6,7 @@ Configuration:
     Property: 
       # 配置日志存放的文件夹
      - name: LOG_HOME
-       value: timertask-logs
+       value: /timertask-logs
      # 配置日志名称
      - name: LOG_NAME_HOME
        value: timertask-logs
