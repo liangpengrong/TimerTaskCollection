@@ -1,7 +1,7 @@
 # logging: 
 # 共有8个级别，按照从低到高为：ALL < TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF。
 Configuration:
-  status: info
+  status: ERROR
   Properties: # 定义全局变量
     Property: 
       # 配置日志存放的文件夹
@@ -79,9 +79,9 @@ Configuration:
        - ref: FileLog
     Logger:
       # 过滤掉spring和mybatis的一些无用的DEBUG信息
-    - name: org.springframework
-      level: TRACE
-      additivity: false
+    #- name: org.springframework
+     # level: TRACE
+      #additivity: false
       
       # 过滤掉spring和mybatis的一些无用的DEBUG信息
     - name: com.zxy.dpiserver.dao

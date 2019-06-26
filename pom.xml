@@ -66,14 +66,18 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <!-- springBoot redis -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+        </dependency>-->
         <!-- RabbitMQ -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -167,11 +171,11 @@
             <version>1.1.9</version>
         </dependency>
         <!-- h2内嵌数据库 -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
-        </dependency>
+        </dependency>-->
         <!-- spring boot mybatis  -->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -223,6 +227,11 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
         </dependency>
+        <!--定时任务需要依赖context模块-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -231,11 +240,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
+                <!--<configuration>
                     <warSourceExcludes>src/main/resources/**</warSourceExcludes>
-                    <!-- 打包为一个可执行的脚本 -->
-                    <!-- <executable>true</executable> -->
-                </configuration>
+                    &lt;!&ndash; 打包为一个可执行的脚本 &ndash;&gt;
+                    &lt;!&ndash; <executable>true</executable> &ndash;&gt;
+                </configuration>-->
             </plugin>
         </plugins>
         <resources>

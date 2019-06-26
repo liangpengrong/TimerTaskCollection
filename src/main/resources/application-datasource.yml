@@ -1,5 +1,5 @@
 datasource: 
-  url: jdbc:mysql://127.0.0.1:3306/mytest?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
+  url: jdbc:mysql://127.0.0.1:3306/quartz_task?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
   # url: jdbc:h2:~/TimerTaskCollection/devdb
   username: root
   password: root
@@ -42,4 +42,3 @@ datasource:
       loginpass: admin
   jmx: 
       enabled: false
-      

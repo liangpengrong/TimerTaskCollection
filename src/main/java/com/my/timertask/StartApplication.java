@@ -16,18 +16,9 @@ import org.springframework.cache.annotation.EnableCaching;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-<<<<<<< HEAD
 @SpringBootApplication
-=======
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, MybatisAutoConfiguration.class})
->>>>>>> 本地
-// 启用Swagger2
 @EnableSwagger2
-// 启用自动配置
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, MybatisAutoConfiguration.class, 
-        QuartzAutoConfiguration.class})
-//MyBatis 支持(扫描dao接口)
-@MapperScan("com.my.timertask.dao")
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, MybatisAutoConfiguration.class})
 public class StartApplication extends SpringBootServletInitializer{
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {

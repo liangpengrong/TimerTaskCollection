@@ -1,0 +1,29 @@
+spring:
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: DefaultQuartzScheduler
+            instanceId: AUTO
+          jobStore:
+            useProperties: false
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            #是否使用集群（如果项目只部署到 一台服务器，就不用了）
+            isClustered: false
+            clusterCheckinInterval: 20000
+            #数据库中quartz表的表名前缀
+            #tablePrefix: nf_
+          # 覆盖掉之前的定时任务
+          overwriteExistingJobs: true
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    #数据库方式
+    job-store-type: MEMORY
+      #初始化表结构
+    jdbc:
+      initialize-schema: ALWAYS
