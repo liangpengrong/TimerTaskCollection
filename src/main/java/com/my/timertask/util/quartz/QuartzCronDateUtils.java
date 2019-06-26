@@ -1,6 +1,5 @@
-package com.my.timertask.util.quartzutils;
+package com.my.timertask.util.quartz;
 
-import java.util.Arrays;
 import java.util.Map;
 
 public class QuartzCronDateUtils {

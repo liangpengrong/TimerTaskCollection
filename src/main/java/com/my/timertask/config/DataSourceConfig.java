@@ -75,17 +75,13 @@ public class DataSourceConfig {
     private String loginpass;
     @Value("${datasource.druidServlet.loginfilter}")
     private String loginfilter;
+
     /**
-    <blockquote>
-    <h1>配置DruidDataSource</h1>
-    * @return
-    * @throws Exception
+     * 配置DruidDataSource
      */
     @Bean(value=DATA_SOURCE_BEAN_NAME)
-    @Scope("singleton")
-    //默认为主数据源
     @Primary
-    public DataSource initDataSource() throws Exception{
+    public DataSource initDataSource() throws Exception {
         DruidDataSource druidDataSource = null;
         try {
             // 实例化DataSource并赋值属性
@@ -130,10 +126,9 @@ public class DataSourceConfig {
         }
         return druidDataSource;
     }
+
     /**
-    <blockquote>
-    <h1>配置Druid管理页面</h1>
-    * @return
+     * 配置Druid管理页面
      */
     @Bean
     public ServletRegistrationBean<?> druidServlet() {

@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import com.github.pagehelper.PageInterceptor;
 * @author [liangpr]
 * @date [2019-01-23 11:15:57]
 */
+@MapperScan("com.my.timertask.dao")
 @Configuration
 public class MybatisConfig {
     private Logger logger = LoggerFactory.getLogger(this.getClass());

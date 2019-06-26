@@ -7,7 +7,7 @@ server:
 spring: 
   profiles:
     # 导入外部的配置文件， 文件名必须为application-xxx.yml格式 
-    include: datasource, mybatis, email, redis, rabbitmq, rabbitmq-myconfig
+    include: datasource, quartz, mybatis, email, quartz
 # log4j日志配置
 logging:
   config: classpath:application-log4j2.yml
