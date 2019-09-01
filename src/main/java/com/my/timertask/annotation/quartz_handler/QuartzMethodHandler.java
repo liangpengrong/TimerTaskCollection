@@ -92,7 +92,6 @@ public class QuartzMethodHandler implements ApplicationContextAware {
                             .setJobStatus(annotation.jobStatus())
                             .setStartDate(StringUtils.isNotEmpty(annotation.startDate())? annotation.startDate() : null)
                             .setStopDate(StringUtils.isNotEmpty(annotation.stopDate())? annotation.stopDate() : null)
-                            .setInitialDelay(annotation.initialDelay())
                             .setDesc(StringUtils.isNotEmpty(annotation.desc())? annotation.desc() : null)
                             .setBeanName(ent.getKey())
                             .setBeanPath(bean.getClass().getName())

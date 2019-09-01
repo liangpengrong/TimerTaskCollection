@@ -7,6 +7,7 @@ import com.my.timertask.util.bean.BeanFactoryUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
+import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class QuartzJobFactory {
         try {
             SchedulerContext schedulerContext = scheduler.getContext();
             Object o = schedulerContext.get("applicationContext");
-            ApplicationContext applicationContext = o != null && o instanceof ApplicationContext? (ApplicationContext)o : null;
+            applicationContext = o != null && o instanceof ApplicationContext? (ApplicationContext)o : null;
         }catch (Exception e) {
             logger.error("无法获取ApplicationContext", e);
         }
@@ -262,7 +263,7 @@ public class QuartzJobFactory {
         retBools = new boolean[scheduleJobs.length];
         for(int i = 0,len=scheduleJobs.length; i < len; i++) {
             QuartzJobHelper helper = combineJobHelper(scheduleJobs[i]);
-            scheduler.scheduleJob(getMethodInvokingJobDetailFactoryBean(helper).getObject(), getCronTriggerFactoryBean(helper).getObject());
+            scheduler.scheduleJob(getJobDetail(helper), getCronTrigge(helper));
             JobKey jobKey = new JobKey(helper.getName(),helper.getGroup());
             if(Trigger.TriggerState.PAUSED.equals(helper.getJobStatus())) {// 判断是否需要暂停
                 scheduler.pauseJob(jobKey);
@@ -279,27 +280,32 @@ public class QuartzJobFactory {
     /**
      * 获取Cron触发器工厂
      */
-    private static CronTriggerFactoryBean getCronTriggerFactoryBean(final QuartzJobHelper helper) throws Exception{
+    private static CronTrigger getCronTrigge(final QuartzJobHelper helper) throws Exception {
+        CronTrigger cronTrigger = null;
         CronTriggerFactoryBean trigger = new CronTriggerFactoryBean();
         trigger.setName(helper.getName());
         trigger.setCronExpression(helper.getCron());
-        trigger.setDescription(helper.getDesc());
         trigger.setGroup(helper.getGroup());
         trigger.getJobDataMap().put(JOB_DATA_MAP_KET, helper);
-        trigger.setJobDetail(getMethodInvokingJobDetailFactoryBean(helper).getObject());
+        trigger.setJobDetail(getJobDetail(helper));
         trigger.afterPropertiesSet();
-        return trigger;
+        cronTrigger = trigger.getObject();
+        return cronTrigger;
     }
-    private static MethodInvokingJobDetailFactoryBean getMethodInvokingJobDetailFactoryBean(final QuartzJobHelper helper) throws Exception{
-        MethodInvokingJobDetailFactoryBean jobDetail = new MethodInvokingJobDetailFactoryBean();
+    private static JobDetail getJobDetail(final QuartzJobHelper helper) throws Exception{
+        JobDetailImpl jobDetail = null;
+        MethodInvokingJobDetailFactoryBean methodInvok = new MethodInvokingJobDetailFactoryBean();
         if(applicationContext == null) throw new NullPointerException("无法执行定时调度。因为无法获取ApplicationContext");
-        jobDetail.setBeanFactory(applicationContext.getAutowireCapableBeanFactory());
-        jobDetail.setGroup(helper.getGroup());
-        jobDetail.setName(helper.getName());
-        jobDetail.setTargetBeanName(helper.getBeanName());
-        jobDetail.setTargetObject(applicationContext.getBean(helper.getBeanName()));
-        jobDetail.setTargetMethod(helper.getMethodName());
-        jobDetail.afterPropertiesSet();
+        methodInvok.setBeanFactory(applicationContext.getAutowireCapableBeanFactory());
+        methodInvok.setGroup(helper.getGroup());
+        methodInvok.setName(helper.getName());
+        methodInvok.setConcurrent(false);// 不会并发执行
+        methodInvok.setTargetBeanName(helper.getBeanName());
+        methodInvok.setTargetObject(applicationContext.getBean(helper.getBeanName()));
+        methodInvok.setTargetMethod(helper.getMethodName());
+        methodInvok.afterPropertiesSet();
+        jobDetail = (JobDetailImpl)methodInvok.getObject();
+        jobDetail.setDescription(helper.getDesc());
         return jobDetail;
     }
     /**

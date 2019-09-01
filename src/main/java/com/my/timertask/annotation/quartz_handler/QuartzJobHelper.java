@@ -19,8 +19,7 @@ import java.util.Map;
  * @author liangpr
  * @date 2019/06/19
  */
-public class QuartzJobHelper implements java.io.Serializable{
-    /** 序列化唯一的ID */
+public class QuartzJobHelper implements java.io.Serializable {
     private static final long serialVersionUID = -636866859781227084L;
     /** 任务名 */
     private String name;

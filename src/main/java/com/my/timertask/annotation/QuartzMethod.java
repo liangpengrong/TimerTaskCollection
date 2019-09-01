@@ -30,5 +30,5 @@ public @interface QuartzMethod {
     /** 任务描述 */
     String desc() default "";
     /** 初始化时延迟多少毫秒后执行 */
-    long initialDelay() default -1;
+    //long initialDelay() default -1;
 }
