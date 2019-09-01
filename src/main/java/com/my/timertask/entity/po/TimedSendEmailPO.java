@@ -31,58 +31,7 @@ public class TimedSendEmailPO implements Serializable{
     private String modifyDate;
     private String modifyUserId;
     public TimedSendEmailPO(){}
-    /** <blockquote>
-    * 
-    * @param id
-    * @param host
-    * @param username
-    * @param warrantCode
-    * @param port
-    * @param protocol
-    * @param toUser
-    * @param eTitle
-    * @param eContent
-    * @param eType
-    * @param eAnnex
-    * @param createDate
-    * @param createUserId
-    * @param name
-    * @param group
-    * @param sysGroup
-    * @param cron
-    * @param startDate
-    * @param stopDate
-    * @param modifyDate
-    * @param modifyUserId
-    */
-    public TimedSendEmailPO(Integer id, String host, String username, String warrantCode, String port, String protocol,
-            String toUser, String eTitle, String eContent, String eType, String eAnnex, String createDate,
-            String createUserId, String name, String group, String sysGroup, String cron, String startDate,
-            String stopDate, String modifyDate, String modifyUserId)
-    {
-        super();
-        this.id = id;
-        this.host = host;
-        this.username = username;
-        this.warrantCode = warrantCode;
-        this.port = port;
-        this.protocol = protocol;
-        this.toUser = toUser;
-        this.eTitle = eTitle;
-        this.eContent = eContent;
-        this.eType = eType;
-        this.eAnnex = eAnnex;
-        this.createDate = createDate;
-        this.createUserId = createUserId;
-        this.name = name;
-        this.group = group;
-        this.sysGroup = sysGroup;
-        this.cron = cron;
-        this.startDate = startDate;
-        this.stopDate = stopDate;
-        this.modifyDate = modifyDate;
-        this.modifyUserId = modifyUserId;
-    }
+    
     /** */
     public Integer getId() {
         return id;
