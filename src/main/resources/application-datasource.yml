@@ -1,4 +1,4 @@
-datasource: 
+datasource:
   url: jdbc:mysql://127.0.0.1:3306/quartz_task?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT&useSSL=false&allowMultiQueries=true&useAffectedRows=false
   # url: jdbc:h2:~/TimerTaskCollection/devdb
   username: root
@@ -33,12 +33,12 @@ datasource:
   # 合并多个DruidDataSource的监控数据
   useGlobalDataSourceStat: true
   # 
-  druidServlet: 
-      # Druid监控界面登陆拦截路径
-      loginfilter: /druid/*
-      # Druid监控界面登陆用户名
-      loginuser: admin
-      # Druid监控界面登陆密码
-      loginpass: admin
-  jmx: 
-      enabled: false
+  druidServlet:
+    # Druid监控界面登陆拦截路径
+    loginfilter: /druid/*
+    # Druid监控界面登陆用户名
+    loginuser: admin
+    # Druid监控界面登陆密码
+    loginpass: admin
+  jmx:
+    enabled: false
