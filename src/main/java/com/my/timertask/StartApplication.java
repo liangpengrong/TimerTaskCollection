@@ -28,7 +28,7 @@ public class StartApplication extends SpringBootServletInitializer{
 	public static void main(String[] args) {
 	    SpringApplication app = new SpringApplication(StartApplication.class);
 	    // 不显示项目启动时的Spring boot
-	    app.setBannerMode(Banner.Mode.OFF);
+	    //app.setBannerMode(Banner.Mode.CONSOLE);
 	    app.run(args);
 	}
 }
